@@ -14,14 +14,14 @@ class api_exception(BaseException):
 async def get_profile(name,tag):
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f'{game_base}/valorant/v1/profile/{name}/{tag}') as data:
+            async with session.get(f'{game_base}/valorant/v2/profile/{name}/{tag}') as data:
                 profile = await data.json() 
                 if profile['status'] == '200':
                     return profile
                 elif profile['status'] != '200':
                     raise api_exception([profile['status'],profile['message'],'Make sure friend requests are enabled and your account is linked on https://tracker.gg/valorant!'])
     except Exception as e:
-        raise api_exception(["404","Something went wrong... try again",""])
+        raise api_exception(["404",e,"try again"])
 
 async def get_matches(name,tag):
     try:
@@ -33,8 +33,8 @@ async def get_matches(name,tag):
                     return matches
                 elif matches['status'] != '200':
                     raise api_exception([matches['status'],matches['message'],'Make sure friend requests are enabled and your account is linked on https://tracker.gg/valorant!'])
-    except:
-        raise api_exception(["404","Something went wrong... try again",""])
+    except Exception as e:
+        raise api_exception(["404",e,"try again /shrug"])
 
 async def get_match(gameid):
     try:
@@ -45,8 +45,9 @@ async def get_match(gameid):
                     return match
                 else:
                     raise api_exception([match['status'],match['message'],'Invalid match ID'])
-    except:
-        raise api_exception(["404","Something went wrong... try again",""])
+    except Exception as e:
+        raise api_exception(["404",e,"try again /shrug"])
+
 
 async def get_mmr(name,tag):
     try:
@@ -71,9 +72,8 @@ async def get_mmr(name,tag):
                 else:
                     raise api_exception([mmr['status'],mmr['data']['message'],'Make sure friend requests are enabled and your account is linked on https://tracker.gg/valorant!'])
     except Exception as e:
-        print(e)
         mmr = {
-            "status":"501",
+            "status":"501", #501 status = not able to fetch MMR
             "data":{
                 "currenttier":0,
                 "currenttierpatched":"Unrated",

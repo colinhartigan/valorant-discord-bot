@@ -1,14 +1,13 @@
 import discord
 import iso8601
 import utils
-import valapi
 import asyncio
 
 
 async def build_error_embed(code,msg,note):
     embed = discord.Embed(
         title=str(code),
-        description=f"**API says:** '{msg}'",
+        description=msg,
         color=0xff6b6b,
     )
     embed.set_footer(text=note)
@@ -24,7 +23,7 @@ async def build_recent_matches(matches,profile):
         description="",
         color=0x5cee49 if matches['matches'][0]['metadata']['playerhaswon'] else 0xee4949,
     )
-    embed.set_author(name=user,icon_url=profile['stats']['playercard'])
+    embed.set_author(name=user,icon_url=profile['stats']['playercard'] if profile['stats']['playercard'] is not None else utils.get_default_card())
     for i,v in enumerate(matches['matches']):
         if i >= 6:
             break
@@ -56,7 +55,7 @@ async def build_profile_details(profile,mmr):
 
     embed = discord.Embed(
         title="Player Profile",
-        description=(f"{stats['rank']}") + (f" ({mmr_data['ranking_in_tier']}/100)" if mmr['status'] != "501" else " elo unavailable" if mmr['status'] == "500" else ""),
+        description=(f"{stats['rank']}") + (f" ({mmr_data['ranking_in_tier']}/100)" if mmr['status'] != "501" else " (elo unavailable)" if mmr['status'] == "501" else ""),
         color=utils.get_rank_color(rank_id)
     )
 
@@ -65,7 +64,7 @@ async def build_profile_details(profile,mmr):
         embed.description = f"{stats['rank']}" + (f" ({mmr_data['elo']} elo)" if mmr['status'] != "500" else "")
 
 
-    embed.set_author(name=profile['user'],icon_url=stats['playercard'])
+    embed.set_author(name=profile['user'],icon_url=(stats['playercard'] if stats['playercard'] is not None else utils.get_default_card()))
     embed.set_thumbnail(url=utils.get_ranked_icon(rank_id))
     embed.set_footer(text="React with 🏅 to see competitive info\nReact with 🏆 to see recent matches")
     embed.add_field(
@@ -150,7 +149,7 @@ async def build_player_details(match,player,team):
 
 
 async def build_team_summary(match,team,otherteam):
-    #team = "blue" or "red"/attackers or async defenders
+    #team = "blue" or "red"/attackers or defenders
     metadata = match['metadata']
     team_meta = match['data']['teams'][team]
     team_data = match['data']['player']['byteam'][team]
@@ -160,11 +159,11 @@ async def build_team_summary(match,team,otherteam):
     emojis = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"]
 
     for i in team_data: 
-        if int(i['scoreaverage']) > int(mvp[1]):
-            mvp = (i['user'],i['scoreaverage'])
+        if int(i['scoreaverage'].replace(",","")) > int(mvp[1]):
+            mvp = (i['user'],i['scoreaverage'].replace(",",""))
 
     embed = discord.Embed(
-        title=("async defenders" if team == "red" else "Attackers") + (f" [{team_meta['roundswon']}-{match['data']['teams'][otherteam]['roundswon']}]"),
+        title=("Defenders" if team == "red" else "Attackers") + (f" [{team_meta['roundswon']}-{match['data']['teams'][otherteam]['roundswon']}]"),
         description="React with a player's number for more player data",
         color=0xee4949 if team == "red" else 0x53b9f9,
         timestamp=iso8601.parse_date(metadata['timestamp'])

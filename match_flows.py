@@ -49,31 +49,21 @@ async def match_history_flow(client,name,tag,message,reply=None,back_callback=No
     await reply.edit(content=message.author.mention,embed=embed)
     await reply.clear_reactions()
 
-    reactions = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","🔙"]
-    for i,v in enumerate(reactions):
-        if i < 6:
-            await reply.add_reaction(v)
-        if not back_callback == None and i >= 6:
-            await reply.add_reaction(v)
-    def check(reaction,user):
-        return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
-    try:
-        reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
-    except asyncio.TimeoutError:
-        await reply.clear_reactions()
-        embed.set_footer(text="")
-        await reply.edit(embed=embed)
+    reactions = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣"]
+    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)
 
-    else:
+    if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        option = reactions.index(str(reaction.emoji))
-        if not option == 6:
+        if not option == -1:
             match = matches['matches'][option]
             await initial_player_summary_flow(client,match,profile,message,reply,match_history_flow,(client,name,tag,message,reply,back_callback,args))
         else:
             await back_callback(*args)
-
+    else:
+        await reply.clear_reactions()
+        embed.set_footer(text="")
+        await reply.edit(embed=embed)
 
 
 
@@ -85,25 +75,12 @@ async def match_details_flow(client,matchid,message,reply,back_callback=None,arg
     await reply.edit(embed=embed)
     await reply.clear_reactions()
 
-    reactions = ["🟦","🟥","🔙"]
-    for i,v in enumerate(reactions):
-        if i < 2:
-            await reply.add_reaction(v)
-        if not back_callback == None and i >= 2:
-            await reply.add_reaction(v)
-    def check(reaction,user):
-        return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
-    try:
-        reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
-    except asyncio.TimeoutError:
-        await reply.clear_reactions()
-        embed.description = ""
-        await reply.edit(embed=embed)
+    reactions = ["🟦","🟥"]
+    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)        
 
-    else:
+    if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        option = reactions.index(str(reaction.emoji))
         if not option == 2:
             if option == 0:
                 await team_summary_flow(client,matchid,"blue",message,reply,match_details_flow,(client,matchid,message,reply,back_callback,args)) 
@@ -111,6 +88,11 @@ async def match_details_flow(client,matchid,message,reply,back_callback=None,arg
                 await team_summary_flow(client,matchid,"red",message,reply,match_details_flow,(client,matchid,message,reply,back_callback,args))
         else: 
             await back_callback(*args)
+    else:
+        await reply.clear_reactions()
+        embed.description = ""
+        await reply.edit(embed=embed)
+
 
 
 async def team_summary_flow(client,matchid,team,message,reply,back_callback=None,args=None):
@@ -121,22 +103,12 @@ async def team_summary_flow(client,matchid,team,message,reply,back_callback=None
 
     team_roster = [i['user'] for i in match['data']['player']['byteam'][team]]
 
-    reactions = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","🔙"]
-    for i in reactions:
-        await reply.add_reaction(i)
-    def check(reaction,user):
-        return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
-    try:
-        reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
-    except asyncio.TimeoutError:
-        await reply.clear_reactions()
-        embed.description = ""
-        await reply.edit(embed=embed)
+    reactions = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"]
+    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)  
 
-    else:
+    if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        option = reactions.index(str(reaction.emoji))
         if not option == 5:
             player = team_roster[option]
             player_dict = {}
@@ -148,6 +120,11 @@ async def team_summary_flow(client,matchid,team,message,reply,back_callback=None
             await player_summary_flow(client,matchid,player_dict,team,message,reply,team_summary_flow,(client,matchid,team,message,reply,back_callback,args))
         else:
             await back_callback(*args)
+    else:
+        await reply.clear_reactions()
+        embed.description = ""
+        await reply.edit(embed=embed)
+
 
 
 async def player_summary_flow(client,matchid,player,team,message,reply,back_callback=None,args=None):
@@ -170,24 +147,11 @@ async def player_summary_flow(client,matchid,player,team,message,reply,back_call
         has_profile = False
 
     reactions = ["⬜","🔙"]
-    for i,v in enumerate(reactions):
-        if i == 0 and has_profile:
-            await reply.add_reaction(v)
-        elif i == 1:
-            await reply.add_reaction(v)
-    def check(reaction,user):
-        return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
-    try:
-        reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
-    except asyncio.TimeoutError:
-        await reply.clear_reactions()
-        embed.description = ""
-        await reply.edit(embed=embed)
-
-    else:
+    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)  
+        
+    if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        option = reactions.index(str(reaction.emoji))
         if not option == 1:
             try:
                 await profile_flows.profile_details_flow(client,name,tag,message,reply,player_summary_flow,(client,matchid,player,team,message,reply,back_callback,args))
@@ -195,7 +159,12 @@ async def player_summary_flow(client,matchid,player,team,message,reply,back_call
                 await player_summary_flow(client,matchid,player,team,message,reply,back_callback,args)
         else:
             await back_callback(*args)
+    else:
+        await reply.clear_reactions()
+        embed.description = ""
+        await reply.edit(embed=embed)
         
+
 
 async def initial_player_summary_flow(client,match,profile,message,reply,back_callback=None,args=None):
     full_match = await valapi.get_match(match['metadata']['gameid'])
@@ -204,25 +173,16 @@ async def initial_player_summary_flow(client,match,profile,message,reply,back_ca
     await reply.clear_reactions()
     
     reactions = ["⬜","🔙"]
-    for i,v in enumerate(reactions):
-        if i < 1:
-            await reply.add_reaction(v)
-        if not back_callback == None and i >= 1:
-            await reply.add_reaction(v)
-    def check(reaction,user):
-        return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
-    try:
-        reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
-    except asyncio.TimeoutError:
-        await reply.clear_reactions()
-        embed.set_footer(text="")
-        await reply.edit(embed=embed)
+    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)     
     
-    else:
+    if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        option = reactions.index(str(reaction.emoji))
         if not option == 1:
             await match_details_flow(client,match['metadata']['gameid'],message,reply,initial_player_summary_flow,(client,match,profile,message,reply,back_callback,args))
         else:
             await back_callback(*args)
+    else:
+        await reply.clear_reactions()
+        embed.set_footer(text="")
+        await reply.edit(embed=embed)

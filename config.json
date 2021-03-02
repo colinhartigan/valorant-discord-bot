@@ -1,0 +1,22 @@
+{
+    "mode_flags":{
+        "unrated":{
+            "team_names":{
+                "red":"Defenders",
+                "blue":"Attackers"
+            },
+            "excluded_fields":{
+
+            }
+        },
+        "spike_rush":{
+            "team_names":{
+                "red":"Defenders",
+                "blue":"Attackers"
+            },
+            "excluded_fields":{
+                "econ_rating":true
+            }
+        }
+    }
+}
