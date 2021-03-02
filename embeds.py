@@ -1,11 +1,11 @@
 import discord
 import iso8601
-import assets
+import utils
 import valapi
 import asyncio
 
 
-def build_error_embed(code,msg,note):
+async def build_error_embed(code,msg,note):
     embed = discord.Embed(
         title=str(code),
         description=f"**API says:** '{msg}'",
@@ -15,7 +15,7 @@ def build_error_embed(code,msg,note):
     return embed
 
 
-def build_recent_matches(matches,profile):
+async def build_recent_matches(matches,profile):
     numbers = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
     user = matches['user']
 
@@ -46,17 +46,18 @@ def build_recent_matches(matches,profile):
 
 
 
-def build_profile_details(profile,mmr):
+async def build_profile_details(profile,mmr):
     stats = profile['stats']
     mmr_data = mmr['data']
+    rank_id = utils.get_rank_id(stats['rank'])
 
     if mmr_data['currenttier'] == -1:
-        mmr_data['currenttier'] = assets.get_rank_id(stats['rank'])
+        rank_id = utils.get_rank_id(stats['rank'])
 
     embed = discord.Embed(
         title="Player Profile",
-        description=(f"{stats['rank']}") + (f" ({mmr_data['ranking_in_tier']}/100)" if mmr['status'] != "500" else ""),
-        color=assets.get_rank_color(mmr_data['currenttier'])
+        description=(f"{stats['rank']}") + (f" ({mmr_data['ranking_in_tier']}/100)" if mmr['status'] != "501" else " elo unavailable" if mmr['status'] == "500" else ""),
+        color=utils.get_rank_color(rank_id)
     )
 
     #change desc for immortal+
@@ -65,8 +66,8 @@ def build_profile_details(profile,mmr):
 
 
     embed.set_author(name=profile['user'],icon_url=stats['playercard'])
-    embed.set_thumbnail(url=assets.get_ranked_icon(mmr_data['currenttier']))
-    embed.set_footer(text="*ACES/CLUTCHES/FLAWLESS COUNTS MIGHT BE WRONG*\nReact with 🏅 to see competitive info\nReact with 🏆 to see recent matches")
+    embed.set_thumbnail(url=utils.get_ranked_icon(rank_id))
+    embed.set_footer(text="React with 🏅 to see competitive info\nReact with 🏆 to see recent matches")
     embed.add_field(
         name="KDA",
         value=f"{stats['kills']}/{stats['deaths']}/{stats['assists']} ({stats['kdratio']})",
@@ -92,26 +93,11 @@ def build_profile_details(profile,mmr):
         value=stats['matches'],
         inline=True,
     )
-    embed.add_field(
-        name="Aces",
-        value=stats['aces'],
-        inline=True,
-    )
-    embed.add_field(
-        name="Clutches",
-        value=stats['clutches'],
-        inline=True,
-    )
-    embed.add_field(
-        name="Flawless",
-        value=stats['flawless'],
-        inline=True,
-    )
     return embed
     
 
 
-def build_player_details(match,player,team):
+async def build_player_details(match,player,team):
     metadata = match['metadata']
 
     embed = discord.Embed(
@@ -120,7 +106,7 @@ def build_player_details(match,player,team):
         timestamp=iso8601.parse_date(metadata['timestamp']),
         color=0xee4949 if team == "red" else 0x53b9f9,
     )
-    embed.set_author(name=player['user'],icon_url=assets.get_icon(player['agentused']))
+    embed.set_author(name=player['user'],icon_url=await utils.get_agent_icon(player['agentused']))
     embed.set_footer(text=f"{metadata['modename']} on {metadata['map']} as {player['agentused']}")
     embed.add_field(
         name="KDA",
@@ -163,13 +149,13 @@ def build_player_details(match,player,team):
 
 
 
-def build_team_summary(match,team,otherteam):
-    #team = "blue" or "red"/attackers or defenders
+async def build_team_summary(match,team,otherteam):
+    #team = "blue" or "red"/attackers or async defenders
     metadata = match['metadata']
     team_meta = match['data']['teams'][team]
     team_data = match['data']['player']['byteam'][team]
 
-    team_roster = [(i['user'],i['agentused'],assets.shorten_rank(i['rank'])) for i in team_data]
+    team_roster = [(i['user'],i['agentused'],utils.shorten_rank(i['rank'])) for i in team_data]
     mvp = ("",0)
     emojis = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"]
 
@@ -178,7 +164,7 @@ def build_team_summary(match,team,otherteam):
             mvp = (i['user'],i['scoreaverage'])
 
     embed = discord.Embed(
-        title=("Defenders" if team == "red" else "Attackers") + (f" [{team_meta['roundswon']}-{match['data']['teams'][otherteam]['roundswon']}]"),
+        title=("async defenders" if team == "red" else "Attackers") + (f" [{team_meta['roundswon']}-{match['data']['teams'][otherteam]['roundswon']}]"),
         description="React with a player's number for more player data",
         color=0xee4949 if team == "red" else 0x53b9f9,
         timestamp=iso8601.parse_date(metadata['timestamp'])
@@ -210,7 +196,7 @@ def build_team_summary(match,team,otherteam):
 
 
 
-def build_match_summary(match):
+async def build_match_summary(match):
     metadata = match['metadata']
     teamsdata = match['data']['teams']
     blue_meta = teamsdata['blue']
@@ -223,9 +209,9 @@ def build_match_summary(match):
     red_roster = []
 
     for i in blue_team:
-        blue_roster.append((i['user'],i['agentused'],assets.shorten_rank(i['rank'])))
+        blue_roster.append((i['user'],i['agentused'],utils.shorten_rank(i['rank'])))
     for i in red_team:
-        red_roster.append((i['user'],i['agentused'],assets.shorten_rank(i['rank'])))
+        red_roster.append((i['user'],i['agentused'],utils.shorten_rank(i['rank'])))
 
     embed = discord.Embed(
         title=("🟥 Defenders Won" if red_meta['haswon'] else "🟦 Attackers Won") + (f" [{blue_meta['roundswon']}-{red_meta['roundswon']}]" if blue_meta['haswon'] else f" [{red_meta['roundswon']}-{blue_meta['roundswon']}]"),
@@ -249,7 +235,7 @@ def build_match_summary(match):
 
 
 
-def build_personal_match_summary(match,full_match,profile):
+async def build_personal_match_summary(match,full_match,profile):
     gamedata = match['game']
     metadata = match['metadata']
     player_match_data = {}
@@ -265,7 +251,7 @@ def build_personal_match_summary(match,full_match,profile):
         color=0x5cee49 if metadata['playerhaswon'] else 0xee4949,
         timestamp=iso8601.parse_date(metadata['timestamp'])
     )
-    embed.set_author(name=profile['user'],icon_url=assets.get_icon(metadata['agentplayed']))
+    embed.set_author(name=profile['user'],icon_url=await utils.get_agent_icon(metadata['agentplayed']))
     embed.set_thumbnail(url=full_match['metadata']['modeimage'])
     embed.set_footer(text=f"{metadata['modename']} on {metadata['map']} as {metadata['agentplayed']}")
 

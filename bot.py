@@ -5,7 +5,7 @@ import valapi
 from valapi import api_exception
 import discord 
 import asyncio
-import assets, embeds
+import utils, embeds
 import iso8601
 import match_flows, profile_flows
 
