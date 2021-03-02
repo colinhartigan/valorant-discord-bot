@@ -49,6 +49,7 @@ async def get_mmr(name,tag):
     try:
         data = requests.get(f'{base}/valorant/v1/mmr/NA/{name}/{tag}')
         mmr = data.json()
+        print(f"mmr: {mmr}")
         if mmr["status"] == "200":
             return mmr
         elif mmr['status'] == "500":

@@ -37,6 +37,9 @@ async def profile_details_flow(client,name,tag,message,reply,back_callback=None,
             await reply.add_reaction(v)
     def check(reaction,user):
         return user == message.author and str(reaction.emoji) in reactions and reaction.message == reply
+    
+    #TODO: USE ASSETS.CHECK_REACTION THINGY TO CHECK IF REACTION IS ALREADY ON BEFORE GOING TO CLIENT.WAIT_FOR
+    cache_rep = discord.utils.get(client.cached_messages, id=reply.id)
     try:
         reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
     except asyncio.TimeoutError:
