@@ -14,7 +14,7 @@ async def build_error_embed(code,msg,note):
     return embed
 
 
-async def build_mmr_history(mmr,profile):
+async def build_mmr_history(mmr,profile,initial=False):
     stats = profile['stats']
     rank_id = utils.get_rank_id(stats['rank'])
 
@@ -32,6 +32,8 @@ async def build_mmr_history(mmr,profile):
         history = mmr['data']
         embed.description = f"{stats['rank']}" + f" ({history[0]['ranking_in_tier']}/100)"
         embed.set_thumbnail(url=utils.get_ranked_icon(rank_id))
+
+        embed.set_footer(text=("React with ⬜ to see profile details" if initial else ""))
 
         for i,v in enumerate(history):
             if i == 6:
@@ -74,7 +76,7 @@ async def build_recent_matches(matches,profile):
         else:
             embed.add_field(
                 name="Match Unavailable",
-                value="",
+                value="Match still processing",
                 inline=True
             )
     return embed

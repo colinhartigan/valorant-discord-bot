@@ -81,7 +81,7 @@ async def match_details_flow(client,matchid,message,reply,back_callback=None,arg
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        if not option == 2:
+        if not option == -1:
             if option == 0:
                 await team_summary_flow(client,matchid,"blue",message,reply,match_details_flow,(client,matchid,message,reply,back_callback,args)) 
             else:
@@ -109,7 +109,7 @@ async def team_summary_flow(client,matchid,team,message,reply,back_callback=None
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        if not option == 5:
+        if not option == -1:
             player = team_roster[option]
             player_dict = {}
 
@@ -146,13 +146,13 @@ async def player_summary_flow(client,matchid,player,team,message,reply,back_call
     except api_exception as e:
         has_profile = False
 
-    reactions = ["⬜","🔙"]
+    reactions = ["⬜"]
     option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)  
         
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        if not option == 1:
+        if not option == -1:
             try:
                 await profile_flows.profile_details_flow(client,name,tag,message,reply,player_summary_flow,(client,matchid,player,team,message,reply,back_callback,args))
             except api_exception as e:
@@ -172,13 +172,13 @@ async def initial_player_summary_flow(client,match,profile,message,reply,back_ca
     await reply.edit(content=message.author.mention,embed=embed)
     await reply.clear_reactions()
     
-    reactions = ["⬜","🔙"]
+    reactions = ["⬜"]
     option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)     
     
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
-        if not option == 1:
+        if not option == -1:
             await match_details_flow(client,match['metadata']['gameid'],message,reply,initial_player_summary_flow,(client,match,profile,message,reply,back_callback,args))
         else:
             await back_callback(*args)

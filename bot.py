@@ -7,7 +7,7 @@ import discord
 import asyncio
 import utils, embeds
 import iso8601
-import match_flows, profile_flows
+import match_flows, profile_flows, content_flows
 
 load_dotenv()
 
@@ -58,6 +58,10 @@ async def on_message(message):
         task = loop.create_task(profile_flows.mmr_search_flow(client,name,tag,message))
         await task
 
+    if command.startswith("/featuredskins"):
+        await message.channel.trigger_typing()
+        task = loop.create_task(content_flows.start_featured_collection_flow(client,message))
+        await task
 
 
 

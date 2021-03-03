@@ -40,7 +40,8 @@ async def wait_for_reactions(client,message,reply,embed,reactions,back_callback=
     # returns -2 on TimeoutError
     # returns -1 for back_callback
     for i in reactions:
-        await reply.add_reaction(i)
+        if not i == "":
+            await reply.add_reaction(i) 
     if back_callback is not None:
         reactions.append("🔙")
         await reply.add_reaction("🔙")
@@ -63,7 +64,6 @@ async def wait_for_reactions(client,message,reply,embed,reactions,back_callback=
         if ind == len(reactions) - 1 and back_callback:
             return -1
         else:
-            print("return ind")
             return ind
 
 

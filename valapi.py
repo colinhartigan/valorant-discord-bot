@@ -28,7 +28,6 @@ async def get_matches(name,tag):
         async with aiohttp.ClientSession() as session:
             async with session.get(f'{game_base}/valorant/v1/matches/{name}/{tag}') as data:
                 matches = await data.json()
-                print(matches)
                 if matches["status"] == "200":
                     return matches
                 elif matches['status'] != '200':
@@ -54,7 +53,6 @@ async def get_mmr(name,tag):
         async with aiohttp.ClientSession() as session:
             async with session.get(f'{game_base}/valorant/v1/mmr/NA/{name}/{tag}') as data:
                 mmr = await data.json()
-                print(f"mmr: {mmr}")
                 if mmr["status"] == "200":
                     return mmr
                 elif mmr['status'] == "500":
@@ -90,7 +88,6 @@ async def get_mmr_history(name,tag):
             async with session.get(f'{game_base}/valorant/v1/mmr-history/na/{name}/{tag}') as data:
                 mmr = await data.json()
                 if mmr['status'] == "200":
-                    print(mmr)
                     return mmr
                 elif mmr['status'] == "500":
                     mmr = {
@@ -114,3 +111,15 @@ async def get_content(endpoint):
         async with session.get(content_base+endpoint) as data:
             payload = await data.json()
             return payload
+
+async def get_collection(theme_uuid):
+    theme_guns = []
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'{content_base}/v1/weapons') as data:
+            weapons = await data.json()
+            for i in weapons['data']:
+                for j in i['skins']:
+                    if j['themeUuid'] == theme_uuid:
+                        print("ye")
+                        theme_guns.append(j)
+    return theme_guns

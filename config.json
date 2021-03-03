@@ -17,6 +17,20 @@
             "excluded_fields":{
                 "econ_rating":true
             }
+        },
+        "competitive":{
+            "team_names":{
+                "red":"Defenders",
+                "blue":"Attackers"
+            },
+            "flags":{
+                "show_comp_movement":true
+            }
         }
+    },
+    
+    "tyrandons":{
+        "username":"tyrandon",
+        "password":"89Achilles^"
     }
 }
