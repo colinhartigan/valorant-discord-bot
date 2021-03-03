@@ -81,4 +81,3 @@ async def wait_for_reactions(client,message,reply,embed,reactions,back_callback=
             return return_selection(reaction)
     else:
         return early_react
-    

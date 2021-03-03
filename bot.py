@@ -50,6 +50,14 @@ async def on_message(message):
         task = loop.create_task(match_flows.match_history_flow(client,name,tag,message))
         await task
 
+    if command.startswith("/mmr"):
+        await message.channel.trigger_typing()
+        user = split[1].split("#")
+        name = user[0]
+        tag = user[1]
+        task = loop.create_task(profile_flows.mmr_search_flow(client,name,tag,message))
+        await task
+
 
 
 

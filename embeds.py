@@ -2,7 +2,7 @@ import discord
 import iso8601
 import utils
 import asyncio
-
+import datetime
 
 async def build_error_embed(code,msg,note):
     embed = discord.Embed(
@@ -14,6 +14,42 @@ async def build_error_embed(code,msg,note):
     return embed
 
 
+async def build_mmr_history(mmr,profile):
+    stats = profile['stats']
+    rank_id = utils.get_rank_id(stats['rank'])
+
+    embed = discord.Embed(
+        title="Competitive Profile",
+        description="",
+        color=utils.get_rank_color(rank_id),
+    )
+    embed.set_author(name=profile['user'],icon_url=stats['playercard'] if stats['playercard'] is not None else utils.get_default_card())
+
+    if mmr["status"] == "501":
+        embed.description = "Unable to fetch competitive profile"
+
+    else:
+        history = mmr['data']
+        embed.description = f"{stats['rank']}" + f" ({history[0]['ranking_in_tier']}/100)"
+        embed.set_thumbnail(url=utils.get_ranked_icon(rank_id))
+
+        for i,v in enumerate(history):
+            if i == 6:
+                break
+            block = v
+            movement = int(block['mmr_change_to_last_game'])
+            timestamp = datetime.datetime.fromtimestamp(block['date_raw']/1000).strftime('%m/%d/%Y')
+
+            embed.add_field(
+                name=("⬆️ " if movement > 0 else "⬇️ " if movement < 0 else "=")+timestamp,
+                value=("**")+("+" if movement > 0 else "" if movement < 0 else "=")+(f"{block['mmr_change_to_last_game']}RR**")+(f"\n{block['currenttierpatched']}")+(f"\n{block['ranking_in_tier']}/100"),
+                inline=True
+            )
+
+    return embed
+
+
+
 async def build_recent_matches(matches,profile):
     numbers = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
     user = matches['user']
@@ -23,7 +59,7 @@ async def build_recent_matches(matches,profile):
         description="",
         color=0x5cee49 if matches['matches'][0]['metadata']['playerhaswon'] else 0xee4949,
     )
-    embed.set_author(name=user,icon_url=profile['stats']['playercard'] if profile['stats']['playercard'] is not None else utils.get_default_card())
+    embed.set_author(name=profile['user'],icon_url=profile['stats']['playercard'] if profile['stats']['playercard'] is not None else utils.get_default_card())
     for i,v in enumerate(matches['matches']):
         if i >= 6:
             break

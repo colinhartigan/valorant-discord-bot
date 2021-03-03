@@ -84,6 +84,29 @@ async def get_mmr(name,tag):
         }
         return mmr
 
+async def get_mmr_history(name,tag):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'{game_base}/valorant/v1/mmr-history/na/{name}/{tag}') as data:
+                mmr = await data.json()
+                if mmr['status'] == "200":
+                    print(mmr)
+                    return mmr
+                elif mmr['status'] == "500":
+                    mmr = {
+                        "status":"501", #501 status = not able to fetch MMR
+                        "data":"unable to fetch MMR data"
+                    }
+                    return mmr
+        return mmr
+    except Exception as e:
+        mmr = {
+            "status":"501", #501 status = not able to fetch MMR
+            "data":"unable to fetch MMR data"
+        }
+        return mmr
+
+
 
 # content apis
 async def get_content(endpoint):
