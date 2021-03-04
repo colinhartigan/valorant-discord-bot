@@ -4,10 +4,10 @@ import valapi
 from valapi import api_exception
 import discord 
 import asyncio
-import utils, embeds
+import utils, profile_embeds
 import iso8601
 import match_flows
-
+import tyrandon_flows
 
 # jump-in points for the main flow
 async def profile_search_flow(client,name,tag,message):
@@ -16,7 +16,7 @@ async def profile_search_flow(client,name,tag,message):
         profile = await valapi.get_profile(name,tag)
     except api_exception as e:
         await reply.delete()
-        embed = await embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
+        embed = await profile_embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
         await message.channel.send(message.author.mention,embed=embed)
         return
     
@@ -28,7 +28,7 @@ async def mmr_search_flow(client,name,tag,message):
         profile = await valapi.get_profile(name,tag)
     except api_exception as e:
         await reply.delete()
-        embed = await embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
+        embed = await profile_embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
         await message.channel.send(message.author.mention,embed=embed)
         return
     
@@ -39,13 +39,13 @@ async def mmr_search_flow(client,name,tag,message):
 async def profile_details_flow(client,name,tag,message,reply,back_callback=None,args=None):
     mmr = await valapi.get_mmr(name,tag)
     profile = await valapi.get_profile(name,tag)
-    embed = await embeds.build_profile_details(profile,mmr)
+    embed = await profile_embeds.build_profile_details(profile,mmr)
     await reply.edit(content=message.author.mention,embed=embed)
     await reply.clear_reactions()
 
     reactions = ["🏅","🏆"]
 
-    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)
+    option = await utils.wait_for_reactions(client,message,reply,reactions,back_callback)
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")
@@ -65,13 +65,13 @@ async def competitive_info_flow(client,name,tag,message,reply,back_callback=None
     mmr = await valapi.get_mmr_history(name,tag)
     profile = await valapi.get_profile(name,tag)
     reactions = []
-    embed = await embeds.build_mmr_history(mmr,profile,True if back_callback is None else False)
+    embed = await profile_embeds.build_mmr_history(mmr,profile,True if (back_callback is None or back_callback == tyrandon_flows.show_tyrandons_flow) else False)
     await reply.edit(content=message.author.mention,embed=embed)
     await reply.clear_reactions()
+ 
+    reactions = ["⬜"] if (back_callback is None or back_callback == tyrandon_flows.show_tyrandons_flow) else [""]
 
-    reactions = ["⬜"] if back_callback is None else [""]
-
-    option = await utils.wait_for_reactions(client,message,reply,embed,reactions,back_callback)
+    option = await utils.wait_for_reactions(client,message,reply,reactions,back_callback)
     if option != -2:
         await reply.clear_reactions()
         await reply.add_reaction("⏳")

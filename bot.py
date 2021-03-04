@@ -5,9 +5,9 @@ import valapi
 from valapi import api_exception
 import discord 
 import asyncio
-import utils, embeds
+import utils
 import iso8601
-import match_flows, profile_flows, content_flows
+import match_flows, profile_flows, content_flows, tyrandon_flows
 
 load_dotenv()
 
@@ -56,6 +56,11 @@ async def on_message(message):
         name = user[0]
         tag = user[1]
         task = loop.create_task(profile_flows.mmr_search_flow(client,name,tag,message))
+        await task
+
+    if command.startswith("/tyrandons"):
+        await message.channel.trigger_typing()
+        task = loop.create_task(tyrandon_flows.show_tyrandons_flow(client,message))
         await task
 
     if command.startswith("/featuredskins"):

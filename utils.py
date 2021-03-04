@@ -33,10 +33,23 @@ def get_rank_id(rank):
 
 def get_default_card():
     return "https://media.valorant-api.com/playercards/e6a07a97-4c48-421f-515e-288379f7a5be/smallart.png"
+
+def get_tyrandon_tag(num):
+    return ('NA1' if not num == 0 else '1549')
 # ------------------------------------------------------------------------------------------
 
 
-async def wait_for_reactions(client,message,reply,embed,reactions,back_callback=None):
+async def build_error_embed(code,msg,note):
+    embed = discord.Embed(
+        title=str(code),
+        description=msg,
+        color=0xff6b6b,
+    )
+    embed.set_footer(text=note)
+    return embed
+
+
+async def wait_for_reactions(client,message,reply,reactions,back_callback=None):
     # returns -2 on TimeoutError
     # returns -1 for back_callback
     for i in reactions:
