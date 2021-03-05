@@ -1,6 +1,7 @@
 import requests
 import asyncio
 import aiohttp
+import utils
 
 game_base = 'https://api.henrikdev.xyz'
 content_base = 'https://valorant-api.com'
@@ -104,6 +105,13 @@ async def get_mmr_history(name,tag):
         return mmr
 
 
+# template for other less-used game apis
+async def get_game_api(endpoint):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(game_base+endpoint) as data:
+            payload = await data.json()
+            return payload
+
 
 # content apis
 async def get_content(endpoint):
@@ -112,14 +120,4 @@ async def get_content(endpoint):
             payload = await data.json()
             return payload
 
-async def get_collection(theme_uuid):
-    theme_guns = []
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'{content_base}/v1/weapons') as data:
-            weapons = await data.json()
-            for i in weapons['data']:
-                for j in i['skins']:
-                    if j['themeUuid'] == theme_uuid:
-                        print("ye")
-                        theme_guns.append(j)
-    return theme_guns
+

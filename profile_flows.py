@@ -16,7 +16,7 @@ async def profile_search_flow(client,name,tag,message):
         profile = await valapi.get_profile(name,tag)
     except api_exception as e:
         await reply.delete()
-        embed = await profile_embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
+        embed = await utils.build_error_embed(e.data[0],e.data[1],e.data[2])
         await message.channel.send(message.author.mention,embed=embed)
         return
     
@@ -28,7 +28,7 @@ async def mmr_search_flow(client,name,tag,message):
         profile = await valapi.get_profile(name,tag)
     except api_exception as e:
         await reply.delete()
-        embed = await profile_embeds.build_error_embed(e.data[0],e.data[1],e.data[2])
+        embed = await utils.build_error_embed(e.data[0],e.data[1],e.data[2])
         await message.channel.send(message.author.mention,embed=embed)
         return
     

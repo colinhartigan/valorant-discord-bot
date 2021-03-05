@@ -20,6 +20,7 @@ async def build_mmr_history(mmr,profile,initial=False):
 
     if mmr["status"] == "501":
         embed.description = "Unable to fetch competitive profile"
+        embed.set_footer(text=("React with ⬜ to see profile details" if initial else ""))
 
     else:
         history = mmr['data']

@@ -63,7 +63,7 @@ async def on_message(message):
         task = loop.create_task(tyrandon_flows.show_tyrandons_flow(client,message))
         await task
 
-    if command.startswith("/featuredskins"):
+    if command.startswith("/skins"):
         await message.channel.trigger_typing()
         task = loop.create_task(content_flows.start_featured_collection_flow(client,message))
         await task

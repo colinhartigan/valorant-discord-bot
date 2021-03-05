@@ -10,7 +10,7 @@ async def show_tyrandons_flow(client,message,reply=None,tyrandons=None):
         reply = await message.channel.send("Gathering tyrandons...")
     
     if tyrandons is not None:
-        await asyncio.sleep(.5)
+        await asyncio.sleep(1)
 
     if tyrandons is None:
         tyrandons = []
@@ -28,7 +28,6 @@ async def show_tyrandons_flow(client,message,reply=None,tyrandons=None):
             profile = {'status':'500'}
             while (mmr['status'] == '500' or profile['status'] == '500') or (mmr['status'] == '501' or profile['status'] == '501'):
                 if timeout_counter > 5:
-                    tyrandons.append((num,mmr,profile))
                     break
                 try:
                     mmr = await valapi.get_mmr(f'tyrandon{num}',utils.get_tyrandon_tag(num))
@@ -61,7 +60,8 @@ async def show_tyrandons_flow(client,message,reply=None,tyrandons=None):
         tyrandons = sorted(tyrandons,key=lambda i: i[0])
     
     embed = await tyrandon_embeds.build_tyrandons(tyrandons)
-    await reply.edit(content="",embed=embed)
+    await reply.edit(content=message.author.mention,embed=embed)
+    await reply.clear_reactions()
 
     reactions = ["0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"]
 

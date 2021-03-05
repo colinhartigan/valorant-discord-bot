@@ -35,7 +35,7 @@ def get_default_card():
     return "https://media.valorant-api.com/playercards/e6a07a97-4c48-421f-515e-288379f7a5be/smallart.png"
 
 def get_tyrandon_tag(num):
-    return ('NA1' if not num == 0 else '1549')
+    return ('NA1' if not num == 0 else '1549') #only tyrandon0 has a tag: 1549
 # ------------------------------------------------------------------------------------------
 
 
