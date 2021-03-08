@@ -65,7 +65,7 @@ async def on_message(message):
 
     if command.startswith("/skins"):
         await message.channel.trigger_typing()
-        task = loop.create_task(content_flows.start_featured_collection_flow(client,message))
+        task = loop.create_task(content_flows.featured_collection_cover_flow(client,message))
         await task
 
 

@@ -7,7 +7,7 @@ import datetime
 async def build_tyrandons(tyrandons):
     embed = discord.Embed(
         title="Tyrandons",
-        description="",
+        description="*??? = unable to get competitive movement*",
         color=0xfa4454
     )
     embed.set_footer(text="react with a number to see more comp info")

@@ -28,9 +28,50 @@ async def build_featured_cover(data):
             continue
     
     embed.add_field(
-        name=f"{emojis[emoji_index]} Flair",
+        name=f"{emojis[emoji_index]} Flair (dont choose this one)",
         value=f"{', '.join((i['displayName']) for i in data['buddies'])}\n{', '.join(i['displayName'] for i in data['cards'])}\n{', '.join(i['displayName'] for i in data['sprays'])}"
+    ) 
+
+    return embed, emoji_index+1
+
+
+async def build_skin_overview(data):
+    tier = content_utils.get_content_tier(data['weapon']['contentTierUuid'])
+    upgrade_levels = []
+    chromas = []
+    for i,v in enumerate(data['weapon']['levels']):
+        if v['levelItem'] is not None:
+            upgrade_levels.append((i+1," "+v['levelItem'].replace('EEquippableSkinLevelItem::','')))
+        else:
+            upgrade_levels.append((i+1,"Base"))
+
+    for i,v in enumerate(data['weapon']['chromas']):
+        if v['displayName'] != data['weapon']['displayName']:
+            chromas.append(v['displayName'][v['displayName'].find('\n'):].strip().strip('()'))
+        else:
+            chromas.append("Base")
+        
+    print(chromas)
+
+    embed = discord.Embed(
+        title="",
+        description=f"Price: **{data['bundle']['BasePrice']}{content_utils.get_currency_type(data['bundle']['CurrencyID'])['displayNameSingular']}**",
+        color=tier['highlightColor']
+    )
+    embed.set_image(url=data['weapon']['chromas'][data['chromas']['index']]['fullRender'])
+    embed.set_author(name=data['weapon']['displayName'],icon_url=tier['displayIcon'])
+    embed.set_footer(text="Use the arrow reactions to select chroma" if data['chromas']['max_index'] != 0 else "")
+
+    embed.add_field(
+        name="Upgrades",
+        value="\n".join(f"Level {i[0]}: {i[1]}" for i in upgrade_levels),
+        inline=True
+    )
+    embed.add_field(
+        name="Chromas",
+        value="\n".join(("➡️ " if i == data['chromas']['index'] else '') + f"{v}" for i,v in enumerate(chromas)),
+        inline=True
     )
 
 
-    return embed, emoji_index+1
+    return embed

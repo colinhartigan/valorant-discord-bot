@@ -87,7 +87,7 @@ async def wait_for_reactions(client,message,reply,reactions,back_callback=None):
     
     if early_react is None:
         try:
-            reaction,user = await client.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction,user = await client.wait_for('reaction_add', timeout=45.0, check=check)
         except asyncio.TimeoutError:
             return -2
         else:
