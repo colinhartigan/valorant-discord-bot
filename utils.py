@@ -81,7 +81,6 @@ async def wait_for_reactions(client,message,reply,reactions,back_callback=None):
 
 
     #check to see if any reactions were added while the bot was initializing them
-    await asyncio.sleep(.2)
     cache_rep = discord.utils.get(client.cached_messages, id=reply.id) 
     early_react = await check_reactions(cache_rep.reactions)
     

@@ -1,6 +1,6 @@
 import discord
 import iso8601
-import content_utils
+import modules.skins.content_utils as content_utils
 import asyncio
 import datetime
 

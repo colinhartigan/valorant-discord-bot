@@ -2,8 +2,8 @@ import valapi
 from valapi import api_exception
 import discord 
 import asyncio
-import utils, tyrandon_embeds
-import profile_flows
+import utils 
+import modules.tyrandons.tyrandon_embeds as tyrandon_embeds
 
 async def show_tyrandons_flow(client,message,reply=None):
     if reply is None:
@@ -24,13 +24,11 @@ async def show_tyrandons_flow(client,message,reply=None):
         nonlocal gathered,tyrandons
         timeout_counter = 0
         mmr = {'status':'500'}
-        profile = {'status':'500'}
-        while (mmr['status'] == '500' or profile['status'] == '500') or (mmr['status'] == '501' or profile['status'] == '501'):
+        while (mmr['status'] == '500' or mmr['status'] == '501'):
             if timeout_counter > 5:
                 break
             try:
                 mmr = await valapi.get_mmr(f'tyrandon{num}',utils.get_tyrandon_tag(num))
-                profile = await valapi.get_profile(f'tyrandon{num}',utils.get_tyrandon_tag(num))
             except api_exception as e:
                 print(e)
                 mmr = {
@@ -43,16 +41,11 @@ async def show_tyrandons_flow(client,message,reply=None):
                         'elo': 0
                     }
                 }
-                profile = {
-                    'stats':{
-                        'rank':'unable to access rank'
-                    }
-                }
             timeout_counter += 1
             await asyncio.sleep(1)
 
         await incriment_gathered()
-        tyrandons.append((num,mmr,profile))
+        tyrandons.append((num,mmr))
 
 
     await asyncio.gather(get_tyrandon(0),get_tyrandon(1),get_tyrandon(2),get_tyrandon(3),get_tyrandon(4),get_tyrandon(5),get_tyrandon(6),get_tyrandon(7),get_tyrandon(8),get_tyrandon(9))
@@ -69,7 +62,7 @@ async def show_tyrandons_flow(client,message,reply=None):
         await reply.add_reaction("⏳")
         if option != -1:
             tyrandon = tyrandons[option]
-            await profile_flows.competitive_info_flow(client,f"tyrandon{option}",utils.get_tyrandon_tag(option),message,reply,show_tyrandons_flow,(client,message,reply))
+            #load competitive info
     else:
         await reply.clear_reactions()
         embed.set_footer(text="")

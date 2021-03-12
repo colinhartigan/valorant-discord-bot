@@ -12,34 +12,10 @@ class api_exception(BaseException):
         self.data = data 
 
 # game apis
-async def get_profile(name,tag):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'{game_base}/valorant/v2/profile/{name}/{tag}') as data:
-                profile = await data.json() 
-                if profile['status'] == '200':
-                    return profile
-                elif profile['status'] != '200':
-                    raise api_exception([profile['status'],profile['message'],'Make sure friend requests are enabled and your account is linked on https://tracker.gg/valorant!'])
-    except Exception as e:
-        raise api_exception(["404",e,"try again"])
-
-async def get_matches(name,tag):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'{game_base}/valorant/v1/matches/{name}/{tag}') as data:
-                matches = await data.json()
-                if matches["status"] == "200":
-                    return matches
-                elif matches['status'] != '200':
-                    raise api_exception([matches['status'],matches['message'],'Make sure friend requests are enabled and your account is linked on https://tracker.gg/valorant!'])
-    except Exception as e:
-        raise api_exception(["404",e,"try again /shrug"])
-
 async def get_match(gameid):
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f'{game_base}/valorant/v1/match/{gameid}') as data:
+            async with session.get(f'{game_base}/valorant/v2/match/{gameid}') as data:
                 match = await data.json()
                 if match['metadata']['gameid'] == gameid:
                     return match
@@ -104,6 +80,20 @@ async def get_mmr_history(name,tag):
         }
         return mmr
 
+async def get_uuid_from_name(name,tag):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'{game_base}/valorant/v1/puuid/{name}/{tag}') as data:
+                data = await data.json()
+                if data['status'] == "200":
+                    return data['data']['puuid']
+    except Exception as e:
+        data = {
+            "status":"501", #501 status = not able to fetch MMR
+            "data":"unable to fetch"
+        }
+        return data
+
 
 # template for other less-used game apis
 async def get_game_api(endpoint):
@@ -119,5 +109,3 @@ async def get_content(endpoint):
         async with session.get(content_base+endpoint) as data:
             payload = await data.json()
             return payload
-
-

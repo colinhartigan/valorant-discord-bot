@@ -4,7 +4,9 @@ import valapi
 from valapi import api_exception
 import discord 
 import asyncio
-import content_utils, content_embeds, utils
+import modules.skins.content_utils as content_utils
+import modules.skins.content_embeds as content_embeds
+import utils
 import iso8601
 
 async def featured_collection_cover_flow(client,message,reply=None):

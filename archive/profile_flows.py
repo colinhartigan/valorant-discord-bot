@@ -38,8 +38,7 @@ async def mmr_search_flow(client,name,tag,message):
 
 async def profile_details_flow(client,name,tag,message,reply,back_callback=None,args=None):
     mmr = await valapi.get_mmr(name,tag)
-    profile = await valapi.get_profile(name,tag)
-    embed = await profile_embeds.build_profile_details(profile,mmr)
+    embed = await profile_embeds.build_profile_details(mmr)
     await reply.edit(content=message.author.mention,embed=embed)
     await reply.clear_reactions()
 
