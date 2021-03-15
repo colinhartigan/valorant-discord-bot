@@ -54,6 +54,8 @@ async def show_tyrandons_flow(client,message,reply=None):
     embed = await tyrandon_embeds.build_tyrandons(tyrandons)
     await reply.edit(content=message.author.mention,embed=embed)
 
+    #uncomment once mmr history and stuff is fixed
+    '''
     reactions = ["0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"]
 
     option = await utils.wait_for_reactions(client,message,reply,reactions)
@@ -67,3 +69,4 @@ async def show_tyrandons_flow(client,message,reply=None):
         await reply.clear_reactions()
         embed.set_footer(text="")
         await reply.edit(embed=embed)
+    '''

@@ -4,6 +4,7 @@ import valapi
 import modules.replay.replay_embeds as replay_embeds
 import modules.replay.replay_utils as replay_utils
 import time 
+import json
 
 async def init_replay(client,message,reply=None,**kwargs):
     if reply is None:
@@ -14,7 +15,7 @@ async def init_replay(client,message,reply=None,**kwargs):
             replay = Replay(client,reply,match)
             await session.close()
             await replay.run_replay()
-
+ 
 
 class Replay:
     def __init__(self,client,reply,match):
@@ -36,7 +37,7 @@ class Replay:
         self.reply_2 = await self.channel.send("...") 
         #self.reply_3 = await self.channel.send("...")
 
-        print(self.rounds)
+        
 
         for id,match_round in enumerate(self.rounds):
             match_round['round_id'] = id+1

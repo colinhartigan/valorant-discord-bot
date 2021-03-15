@@ -71,7 +71,7 @@ async def on_message(message):
 
     if command.startswith("/skins"):
         await message.channel.trigger_typing()
-        task = loop.create_task(featured_collection.featured_collection_cover_flow(client,message))
+        task = loop.create_task(featured_collection.init_session(client,message))
         await task
 
     if command.startswith("/replay"):
@@ -81,7 +81,7 @@ async def on_message(message):
 
     if command.startswith("/test"):
         await message.channel.trigger_typing()
-        task = loop.create_task(clientapi.get_matches('eaa0d224-61bc-593a-a083-d6e18161e4c5'))
+        task = loop.create_task(clientapi.get_matches('5f306819-e918-4446-b7d2-32087412bbb0'))
         await task
 
 

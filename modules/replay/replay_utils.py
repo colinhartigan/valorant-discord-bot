@@ -1,5 +1,5 @@
 import asyncio
-
+ 
 converted_results = {
     'Eliminated':'elimination',
     'Bomb defused':'defusal',

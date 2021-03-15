@@ -6,7 +6,7 @@ import datetime
 
 async def build_featured_cover(data):
     embed = discord.Embed(
-        title=data['bundle_assets']['displayName'],
+        title=f"Collection - {data['bundle_assets']['displayName']}",
         description="/".join(i['displayName'].replace(data['bundle_assets']['displayName'],"").strip(' ').upper() for i in data['weapons']),
         color=content_utils.get_content_tier(data['weapons'][0]['contentTierUuid'])['highlightColor']
     ) 
@@ -28,7 +28,8 @@ async def build_featured_cover(data):
             continue
     
     embed.add_field(
-        name=f"{emojis[emoji_index]} Flair (dont choose this one)",
+        #name=f"{emojis[emoji_index]} Flair (dont choose this one)",
+        name="Flair",
         value=f"{', '.join((i['displayName']) for i in data['buddies'])}\n{', '.join(i['displayName'] for i in data['cards'])}\n{', '.join(i['displayName'] for i in data['sprays'])}"
     ) 
 
@@ -50,8 +51,6 @@ async def build_skin_overview(data):
             chromas.append(v['displayName'][v['displayName'].find('\n'):].strip().strip('()'))
         else:
             chromas.append("Base")
-        
-    print(chromas)
 
     embed = discord.Embed(
         title="",
@@ -75,3 +74,20 @@ async def build_skin_overview(data):
 
 
     return embed
+
+'''
+async def build_flair_overview(data):
+    embed = discord.Embed(
+        title=f"Flair - {data['bundle_assets']['displayName']}",
+        description=f"{len(data['buddies'])} BUDDIES/{len(data['cards'])} CARDS/{len(data['sprays'])} SPRAYS",
+        color=data['bundle_assets']['highlightColor']
+    )
+
+    embed.set_thumbnail(url=data['bundle_assets']['verticalPromoImage'])
+    emojis = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"]
+    emoji_index = 0
+
+    
+
+    return embed
+'''

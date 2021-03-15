@@ -5,8 +5,8 @@ import json
 import os
 
 
-async def client_get(username,password,endpoint):
-    session = aiohttp.ClientSession()
+async def auth(username,password):
+    session = aiohttp.ClientSession() 
     data = {
         'client_id': 'play-valorant-web-prod',
         'nonce': '1',
@@ -43,15 +43,48 @@ async def client_get(username,password,endpoint):
     user_id = data['sub']
     #print('User ID: ' + user_id)
     headers['X-Riot-Entitlements-JWT'] = entitlements_token
-
-    async with session.get(f'https://pd.na.a.pvp.net{endpoint}', headers=headers) as r:
-        final_data = json.loads(await r.text())
-
     await session.close()
+    return user_id, headers
 
-    return final_data
 
-async def get_matches(uuid):
-    matches = await client_get(os.environ.get('USER'), os.environ.get('PASS'),f'/match-history/v1/history/{uuid}?startIndex=0&endIndex=10')
-    print(matches)
-    return matches
+async def get_auth(user, passw):
+    loop = asyncio.get_event_loop()
+    user_id,headers = await auth(user, passw)
+    return user_id,headers
+
+async def get_glz(endpoint,headers):
+    session = aiohttp.ClientSession()
+    async with session.get(f'https://glz-na-1.na.a.pvp.net{endpoint}', headers=headers) as r:
+        data = json.loads(await r.text())
+        await session.close()
+    return data
+
+async def get_pd(endpoint,headers):
+    session = aiohttp.ClientSession()
+    async with session.get(f'https://pd.na.a.pvp.net{endpoint}', headers=headers) as r:
+        data = json.loads(await r.text())
+        await session.close()
+    return data
+
+async def post_glz(endpoint,headers):
+    session = aiohttp.ClientSession()
+    async with session.post(f'https://glz-na-1.na.a.pvp.net{endpoint}', headers=headers) as r:
+        data = json.loads(await r.text())
+        await session.close()
+    return data
+
+
+
+async def get_matches(id):
+    uuid,headers = await get_auth(os.environ.get('USER'), os.environ.get('PASS'))
+
+    #match = await get_glz(f'/session/v1/sessions/{uuid}',headers)
+    #matches = await get_glz('/match-history/v1/history/eaa0d224-61bc-593a-a083-d6e18161e4c5?startIndex=0&endIndex=10',headers)
+    #print(matches)
+    match = await get_glz(f'/core-game/v1/matches/{id}',headers)
+    print(f"{match}\n")
+    match1 = await get_pd(f'/match-details/v1/matches/{id}',headers)
+    print(match1)
+    with open('match_response_reference.json','w') as file:
+        json.dump(match,file)
+    #print(matches)

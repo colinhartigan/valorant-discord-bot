@@ -12,7 +12,7 @@ async def build_round_overview(data):
     )
     #add round k/d/a for each roster
     #maybe put footer with mode info/time
-    return embed
+    return embed 
 
 
 async def build_timeline(data):
